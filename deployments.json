@@ -1,0 +1,7 @@
+{
+    "goerli": {
+        "SporesMetadataRenderer": "0xE5E242bB52266366735ED5Ea714e84Ed7765D1f0",
+        "SporesRemixMinter": "0xF6A93c66f89BE1985c73F08068F64a8C7f72aEcE",
+        "ZporeDropCreator": "0x4AA9273F89e5c8f9eb1E1269bdde8671f72c28B6",
+    }
+}
