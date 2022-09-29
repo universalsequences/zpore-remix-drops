@@ -3,17 +3,17 @@ pragma solidity ^0.8.13;
 
 import {console} from "forge-std/console.sol";
 import "forge-std/Test.sol";
-import "../src/SporesMetadataRenderer.sol";
+import "../src/ZporeMetadataRenderer.sol";
 import "../src/ERC721DropMock.sol";
 import "../src/Base64.sol";
 
-contract SporesMetadataRendererTest is Test {
-    SporesMetadataRenderer public renderer;
+contract ZporeMetadataRendererTest is Test {
+    ZporeMetadataRenderer public renderer;
     ERC721DropMock public drop;
 
     function setUp() public {
 
-        renderer = new SporesMetadataRenderer();
+        renderer = new ZporeMetadataRenderer();
 
         drop = new ERC721DropMock
             (
@@ -25,10 +25,11 @@ contract SporesMetadataRendererTest is Test {
               "This is a song",
               "contractTest"));
                                                     
-        SporesMetadataRenderer.SporesRemix memory remix = SporesMetadataRenderer.SporesRemix({
+        ZporeMetadataRenderer.ZporeRemix memory remix = ZporeMetadataRenderer.ZporeRemix({
             contentURI: "content",
             coverArtURI: "image",
-            caption: "caption"
+            caption: "caption",
+            zorbId: 1000
             });
         renderer.updateTokenURI(address(drop), 1, remix);
     }
@@ -44,6 +45,7 @@ contract SporesMetadataRendererTest is Test {
                     abi.encodePacked(
                         "{\"name\": \"", _name, "\", \"description\": \"", _description, "\",",
                         "\"caption\": \"", _caption, "\", ",
+                        "\"zorbId\": 1000, ",
                         "\"image\": \"", _coverArtURI, "\", ",
                         "\"image_url\": \"", _coverArtURI, "\", ",
                         "\"animation_url\": \"", _contentURI, "\""

@@ -2,7 +2,6 @@
 pragma solidity ^0.8.10; import './IZoraNFTCreator.sol';
 import './IERC721Drop.sol';
 import {console} from "forge-std/console.sol";
-import './SporesMetadataRenderer.sol';
 
 contract ZporeDropCreator {
 

@@ -1,30 +1,24 @@
+
 // SPDX-License-Identifier: UNLICENSED
 pragma solidity ^0.8.13;
 
 import {console} from "forge-std/console.sol";
 import "forge-std/Test.sol";
-import "../src/SporesMetadataRenderer.sol";
-import "../src/SporesRemixMinter.sol";
+import "../src/ZporeMetadataRenderer.sol";
+import "../src/ZporeMinter.sol";
 import "../src/ERC721DropMock.sol";
 import "../src/Base64.sol";
 
-contract SporesMinterTest is Test {
-    SporesMetadataRenderer public renderer;
-    SporesRemixMinter public minter;
+contract ZporeMinterTest is Test {
+    ZporeMetadataRenderer public renderer;
+    ZporeMinter public minter;
     ERC721DropMock public drop;
 
     function setUp() public {
 
-        renderer = new SporesMetadataRenderer();
-        minter = new SporesRemixMinter(address(renderer));
+        renderer = new ZporeMetadataRenderer();
+        minter = new ZporeMinter(address(renderer));
 
-        console.log(string(abi.encode
-             (
-              "Psilocybin",
-              "Keyon Christ",
-              "This is a song",
-              "contractTest")));
-                    
         drop = new ERC721DropMock
             (
              renderer,
@@ -38,10 +32,11 @@ contract SporesMinterTest is Test {
     }
 
     function testMint() public {
-        SporesMetadataRenderer.SporesRemix memory remix = SporesMetadataRenderer.SporesRemix({
+        ZporeMetadataRenderer.ZporeRemix memory remix = ZporeMetadataRenderer.ZporeRemix({
             contentURI: "content",
             coverArtURI: "image",
-            caption: "caption"
+            caption: "caption",
+            zorbId: 1000
             });
 
         minter.purchase(payable(address(drop)), remix);
@@ -56,6 +51,7 @@ contract SporesMinterTest is Test {
                     abi.encodePacked(
                         "{\"name\": \"", _name, "\", \"description\": \"", _description, "\",",
                         "\"caption\": \"", _caption, "\", ",
+                        "\"zorbId\": 1000, ",
                         "\"image\": \"", _coverArtURI, "\", ",
                         "\"image_url\": \"", _coverArtURI, "\", ",
                         "\"animation_url\": \"", _contentURI, "\""

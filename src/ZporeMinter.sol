@@ -2,21 +2,21 @@
 pragma solidity ^0.8.10;
 import './IERC721Drop.sol';
 import {console} from "forge-std/console.sol";
-import './SporesMetadataRenderer.sol';
+import './ZporeMetadataRenderer.sol';
 
-contract SporesRemixMinter  {
+contract ZporeMinter  {
 
-    SporesMetadataRenderer _metadataRenderer;
+    ZporeMetadataRenderer _metadataRenderer;
 
     constructor(address renderer) {
-        _metadataRenderer = SporesMetadataRenderer(renderer);
+        _metadataRenderer = ZporeMetadataRenderer(renderer);
     }
   
     // upon minting a token, the custom minter will immediately call this function and pass
     // it the spores remix data to set that tokenId
     function purchase(
       address payable target,
-      SporesMetadataRenderer.SporesRemix memory data
+      ZporeMetadataRenderer.ZporeRemix memory data
       ) public payable
     {
         address to = msg.sender;
