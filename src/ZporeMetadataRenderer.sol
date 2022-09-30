@@ -34,20 +34,47 @@ contract ZporeMetadataRenderer is IMetadataRenderer, MetadataRenderAdminCheck {
     }
 
     function tokenURI(uint256 tokenId) external view returns (string memory) {
+        return string(abi.encodePacked(
+          'data:application/json;base64,',
+          Base64.encode(bytes(
+            abi.encodePacked(
+              "{",
+              "\"name\": \"", tokenName(msg.sender, tokenId), "\", ", 
+              originalSongMetadata(msg.sender),
+              remixMetadata(msg.sender, tokenId),
+              "}"
+            )))));
+    }
+
+    function tokenName(address from, uint256 tokenId) internal view returns (string memory) {
+        return string( 
+          abi.encodePacked(
+            metadataBaseByContract[msg.sender].song,
+            " (Remix #", Conversion.uint2str(tokenId), ")"
+            ));
+    }
+
+    function originalSongMetadata(address from) internal view returns (string memory) {
+        MetadataURIInfo memory data = metadataBaseByContract[msg.sender];
+        return string( 
+          abi.encodePacked(
+              "\"description\": \"", data.description, "\", ",
+              "\"artist\": \"", data.artist, "\", "
+                           ));
+    }
+
+    function remixMetadata(address from, uint256 tokenId) internal view returns (string memory) {
         ZporeRemix memory data = tokenRemixes[msg.sender][tokenId];
         uint256 zorbId = tokenRemixes[msg.sender][tokenId].zorbId;
-        return string(abi.encodePacked('data:application/json;base64,',
-            Base64.encode(bytes(
-                    abi.encodePacked(
-                        "{\"name\": \"Zpore Remix\", ",
-                        "\"description\": \"", metadataBaseByContract[msg.sender].description, "\",",
-                        "\"caption\": \"", tokenRemixes[msg.sender][tokenId].caption, "\", ",
-                        "\"zorbId\": ", Conversion.uint2str(zorbId), ", ",
-                        "\"image\": \"", data.coverArtURI, "\", ",
-                        "\"image_url\": \"", data.coverArtURI, "\", ",
-                        "\"animation_url\": \"", data.contentURI, "\""
-                        "}")))));
+        return string( 
+          abi.encodePacked(
+            "\"caption\": \"", tokenRemixes[msg.sender][tokenId].caption, "\", ",
+            "\"zorbId\": ", Conversion.uint2str(zorbId), ", ",
+            "\"image\": \"", data.coverArtURI, "\", ",
+            "\"image_url\": \"", data.coverArtURI, "\", ",
+            "\"animation_url\": \"", data.contentURI, "\""));
     }
+
 
     function contractURI() external view returns (string memory) {
         string memory uri = metadataBaseByContract[msg.sender].contractURI;

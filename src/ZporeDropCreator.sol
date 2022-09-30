@@ -7,17 +7,11 @@ contract ZporeDropCreator {
 
     IZoraNFTCreator creator;
     IERC721Drop.SalesConfiguration salesConfig;
-    bytes metadataInitializer;
 
     constructor(address creatorAddress) {
         creator = IZoraNFTCreator(creatorAddress);
 
-        metadataInitializer = abi.encode(
-           "Test/",
-           "check",
-           "YOOO",
-           "SUP");
-                                                      
+                                                     
         salesConfig = IERC721Drop.SalesConfiguration({
             publicSalePrice: 0,
             maxSalePurchasePerAddress: 10,
@@ -29,23 +23,33 @@ contract ZporeDropCreator {
             });
     }
   
-    // upon minting a token, the custom minter will immediately call this function and pass
-    // it the spores remix data to set that tokenId
+    // A reusable function for creating new drops using Zoras Drop contracts
+    // with the initial media set 
     function newDrop(
+      string memory name,
+      string memory symbol,
+      string memory songName,
+      string memory artistName,
+      string memory description,
+      address fundsRecipient,
       address defaultAdmin,
       address metadataRenderer
       ) public payable
     {
-
         creator.setupDropsContract(
-          "TEST",
-          "yo",
+          name,
+          symbol,
           defaultAdmin,
-          100,
+          1000,
           500,
-          payable(msg.sender),
+          payable(fundsRecipient),
           salesConfig,
           IMetadataRenderer(metadataRenderer),
-          metadataInitializer);
+          abi.encode(
+            songName,
+            artistName,
+            description,
+            "contractURI" // is this relevant?
+                     ));
     }
 }

@@ -4,6 +4,7 @@ pragma solidity ^0.8.10;
 import {IMetadataRenderer} from "./IMetadataRenderer.sol";
 import {IERC721Drop} from "./IERC721Drop.sol";
 
+// @notice A mock implementation of IERC721Drop, used in testing.
 contract ERC721DropMock is IERC721Drop {
 
     IMetadataRenderer metadataRenderer;

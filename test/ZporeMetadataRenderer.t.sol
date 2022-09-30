@@ -22,28 +22,30 @@ contract ZporeMetadataRendererTest is Test {
              (
               "Psilocybin",
               "Keyon Christ",
-              "This is a song",
-              "contractTest"));
-                                                    
+              "Description",
+              "contractURI"));
+    }
+
+    function testTokenURIUpdate() public {
         ZporeMetadataRenderer.ZporeRemix memory remix = ZporeMetadataRenderer.ZporeRemix({
             contentURI: "content",
             coverArtURI: "image",
             caption: "caption",
             zorbId: 1000
             });
-        renderer.updateTokenURI(address(drop), 1, remix);
-    }
 
-    function testIncrement() public {
-        string memory _name = "Zpore Remix";
-        string memory _description = "This is a song";
+        renderer.updateTokenURI(address(drop), 1, remix);
+ 
         string memory _caption = "caption";
         string memory _coverArtURI = "image";
         string memory _contentURI = "content";
+        string memory _artist = "Keyon Christ";
         string memory packed = string(abi.encodePacked('data:application/json;base64,',
             Base64.encode(bytes(
                     abi.encodePacked(
-                        "{\"name\": \"", _name, "\", \"description\": \"", _description, "\",",
+                        "{\"name\": \"Psilocybin (Remix #1)\", ",
+                        "\"description\": \"Description\", ",
+                        "\"artist\": \"Keyon Christ\", ",
                         "\"caption\": \"", _caption, "\", ",
                         "\"zorbId\": 1000, ",
                         "\"image\": \"", _coverArtURI, "\", ",

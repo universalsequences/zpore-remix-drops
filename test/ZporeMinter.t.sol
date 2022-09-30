@@ -26,8 +26,8 @@ contract ZporeMinterTest is Test {
              (
               "Psilocybin",
               "Keyon Christ",
-              "This is a song",
-              "contractTest"));
+              "Description",
+              "contractURI"));
                                                     
     }
 
@@ -41,15 +41,16 @@ contract ZporeMinterTest is Test {
 
         minter.purchase(payable(address(drop)), remix);
 
-        string memory _name = "Zpore Remix";
-        string memory _description = "This is a song";
+        string memory _name = "Psilocybin (Remix #1)";
+        string memory _description = "Description";
         string memory _caption = "caption";
         string memory _coverArtURI = "image";
         string memory _contentURI = "content";
         string memory packed = string(abi.encodePacked('data:application/json;base64,',
             Base64.encode(bytes(
                     abi.encodePacked(
-                        "{\"name\": \"", _name, "\", \"description\": \"", _description, "\",",
+                        "{\"name\": \"", _name, "\", \"description\": \"", _description, "\", ",
+                        "\"artist\": \"Keyon Christ\", ",
                         "\"caption\": \"", _caption, "\", ",
                         "\"zorbId\": 1000, ",
                         "\"image\": \"", _coverArtURI, "\", ",
