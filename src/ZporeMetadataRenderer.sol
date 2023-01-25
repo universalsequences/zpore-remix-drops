@@ -4,14 +4,30 @@ import './IMetadataRenderer.sol';
 import './Base64.sol';
 import './Conversion.sol';
 import {MetadataRenderAdminCheck} from './MetadataRenderAdminCheck.sol';
+import './AddressUtils.sol';
 
 contract ZporeMetadataRenderer is IMetadataRenderer, MetadataRenderAdminCheck {
 
     struct ZporeRemix {
         string contentURI;
         string coverArtURI;
-        string caption;
         uint256 zorbId;
+
+        // stemIds, if stemId=0 then that stem is actually another
+        // remix and we use the contractAddresses+tokenIds arrays values
+
+        // remix DNA, tells us what stems are 
+        uint8 []stemPercentages;
+
+        // using these fields, we can calculate the pitch offset we
+        // need to load a remix as a stem and have it be in key
+        string bpm; // in case, we're pitched down (and thus slowed down)
+        string detune; // again, in case we're pitched down
+
+        // list of contract address+tokenid pairs used in the remix
+        // some of which maybe stems from the stems contract, but could be
+        address [] contractAddresses;
+        uint256 [] ids;
     }
 
     mapping (address => mapping(uint256 => ZporeRemix)) tokenRemixes;
@@ -68,13 +84,67 @@ contract ZporeMetadataRenderer is IMetadataRenderer, MetadataRenderAdminCheck {
         uint256 zorbId = tokenRemixes[msg.sender][tokenId].zorbId;
         return string( 
           abi.encodePacked(
-            "\"caption\": \"", tokenRemixes[msg.sender][tokenId].caption, "\", ",
-            "\"zorbId\": ", Conversion.uint2str(zorbId), ", ",
             "\"image\": \"", data.coverArtURI, "\", ",
             "\"image_url\": \"", data.coverArtURI, "\", ",
-            "\"animation_url\": \"", data.contentURI, "\""));
+            "\"animation_url\": \"", data.contentURI, "\", ",
+            remixDNA(data), ", ",
+            traitsMetadata(data, zorbId)
+                           ));
     }
 
+    function remixDNA(ZporeRemix memory remix) internal view returns (string memory) {
+        string memory traits = "\"remix_dna\": [";
+                
+        for (uint256 i=0; i < remix.contractAddresses.length; i++) {
+            traits = string(
+                abi.encodePacked(
+                    traits,
+                    "{",
+                    "\"contract_address\": \"", AddressUtils.toAsciiString(remix.contractAddresses[i]), "\",",
+                    "\"token_id\": \"", Conversion.uint2str(remix.ids[i]), "\"",
+                    "}"));
+            if (i < remix.ids.length - 1) {
+                traits = string(
+                    abi.encodePacked(
+                        traits,
+                        ", "));
+
+            }
+        }
+        return string(abi.encodePacked(traits, "]"));
+    }
+
+    function traitsMetadata(ZporeRemix memory remix, uint256 zorbId) internal view returns (string memory) {
+        string memory traits = string(
+            abi.encodePacked(
+                "\"attributes\": [",
+                "{\"trait_type\": \"zorb\",\"value\": \"", Conversion.uint2str(zorbId), "\"}, "
+                "{\"trait_type\": \"detune\",\"value\": \"", remix.detune, "\"}, "
+                "{\"trait_type\": \"bpm\",\"value\": \"", remix.bpm, "\"}"
+            ));
+
+        if (remix.contractAddresses.length > 0) {
+            traits = string(abi.encodePacked(traits, ", "));
+        }
+        
+        for (uint256 i=0; i < remix.contractAddresses.length; i++) {
+            traits = string(
+                abi.encodePacked(
+                    traits,
+                    "{",
+                    "\"trait_type\": \"Stem ", abi.encodePacked(AddressUtils.toAsciiString(remix.contractAddresses[i]), " #", Conversion.uint2str(remix.ids[i])), "\",",
+                    "\"value\": \"", Conversion.uint2str(remix.stemPercentages[i]), "%\"",
+                    "}"));
+            if (i < remix.ids.length - 1) {
+                traits = string(
+                    abi.encodePacked(
+                        traits,
+                        ", "));
+
+            }
+        }
+        return string(abi.encodePacked(traits, "]"));
+    }
 
     function contractURI() external view returns (string memory) {
         string memory uri = metadataBaseByContract[msg.sender].contractURI;

@@ -32,30 +32,50 @@ contract ZporeMinterTest is Test {
     }
 
     function testMint() public {
+        address address1 = address(0x11119604aE811E29B8fa22b12F67F79eb67d17BA);
+        address address2 = address(0x22229104AE811e29b8Fa22b12F67f79EB67d17ba);
+        
         ZporeMetadataRenderer.ZporeRemix memory remix = ZporeMetadataRenderer.ZporeRemix({
             contentURI: "content",
             coverArtURI: "image",
-            caption: "caption",
-            zorbId: 1000
+            zorbId: 1000,
+            stemPercentages: new uint8[](2),
+            bpm: "100.2",
+            detune: "-2000",
+            contractAddresses: new address[](2),
+            ids: new uint256[](2)
             });
+
+        remix.stemPercentages[0] = 80;
+        remix.stemPercentages[1] = 20;
+
+        remix.contractAddresses[0] = address1;
+        remix.contractAddresses[1] = address2;
+        remix.ids[0] = 10;
+        remix.ids[1] = 20;
 
         minter.purchase(payable(address(drop)), remix);
 
         string memory _name = "Psilocybin (Remix #1)";
         string memory _description = "Description";
-        string memory _caption = "caption";
-        string memory _coverArtURI = "image";
-        string memory _contentURI = "content";
         string memory packed = string(abi.encodePacked('data:application/json;base64,',
             Base64.encode(bytes(
                     abi.encodePacked(
                         "{\"name\": \"", _name, "\", \"description\": \"", _description, "\", ",
                         "\"artist\": \"Keyon Christ\", ",
-                        "\"caption\": \"", _caption, "\", ",
-                        "\"zorbId\": 1000, ",
-                        "\"image\": \"", _coverArtURI, "\", ",
-                        "\"image_url\": \"", _coverArtURI, "\", ",
-                        "\"animation_url\": \"", _contentURI, "\""
+                        "\"image\": \"image\", ",
+                        "\"image_url\": \"image\", ",
+                        "\"animation_url\": \"content\", ",
+                        "\"remix_dna\": [",
+                        "{\"contract_address\": \"0x11119604ae811e29b8fa22b12f67f79eb67d17ba\",\"token_id\": \"10\"}, ",
+                        "{\"contract_address\": \"0x22229104ae811e29b8fa22b12f67f79eb67d17ba\",\"token_id\": \"20\"}",
+                        "], "
+                        "\"attributes\": [",
+                        "{\"trait_type\": \"zorb\",\"value\": \"1000\"}, ",
+                        "{\"trait_type\": \"detune\",\"value\": \"-2000\"}, ",
+                        "{\"trait_type\": \"bpm\",\"value\": \"100.2\"}, ",
+                        "{\"trait_type\": \"Stem 0x11119604ae811e29b8fa22b12f67f79eb67d17ba #10\",\"value\": \"80%\"}, ",
+                        "{\"trait_type\": \"Stem 0x22229104ae811e29b8fa22b12f67f79eb67d17ba #20\",\"value\": \"20%\"}]",
                         "}")))));
 
         assertEq(drop.tokenURI(1), packed);
